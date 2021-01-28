@@ -22,6 +22,7 @@ class Business {
 
 	async _init() {
 		this.view.configureRecordButton(this.onRecordPressed.bind(this));
+		this.view.configureLeaveButton(this.onLeavePressed.bind(this));
 		this.currentStream = await this.media.getCamera();
 
 		this.socket = this.socketBuilder
@@ -44,7 +45,7 @@ class Business {
 
 	addVideoStream(userId, stream = this.currentStream) {
 		const recorderInstance = new Recorder(userId, stream);
-		const isCurrentId  = false
+		const isCurrentId  = (userId === this.currentPeer.id);
 
 		this.usersRecordings.set(recorderInstance.filename, recorderInstance);
 		if (this.recordingEnabled) recorderInstance.startRecording();
@@ -76,6 +77,7 @@ class Business {
 			}
 
 			this.view.setParticipants(this.peers.size);
+			this.stopRecording(userId);
 			this.view.removeVideoElement(userId);
 		}
 	}
@@ -104,8 +106,10 @@ class Business {
 	onPeerStreamReceived() {
 		return (call, stream) => {
 			const callerId = call.peer;
-			this.addVideoStream(callerId, stream);
 
+			if (this.peers.has(callerId)) return console.log('calling twice, ignoring second call', callerId);
+
+			this.addVideoStream(callerId, stream);
 			this.peers.set(callerId, {call})
 			this.view.setParticipants(this.peers.size);
 		}
@@ -154,6 +158,17 @@ class Business {
 			if (!isRecordingActive) continue;
 
 			await rec.stopRecording();
+			this.playRecordings(key);
 		}
+	}
+
+	playRecordings(userId) {
+		const user = this.usersRecordings.get(userId);
+		const vidoesURLs = user.getAllVideosUrls();
+		vidoesURLs.map(url => this.view.renderVideo({url, userId}))
+	}
+
+	onLeavePressed() {
+		this.usersRecordings.forEach((value, key) => value.download());
 	}
 }

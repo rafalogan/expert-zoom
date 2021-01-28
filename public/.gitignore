@@ -1,0 +1,18 @@
+# idea's
+\.idea
+\.vscode
+
+# files
+.DS_Store
+.env
+
+# folders
+\dist
+\build
+data/data-base
+\coverage
+\.nyc_output
+
+# Modules
+node_modules
+

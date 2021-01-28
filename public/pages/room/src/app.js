@@ -1,14 +1,15 @@
 const onload = () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const socketUrl = 'http://localhost:3000';
+  // const socketUrl = 'http://localhost:3000';
+  const socketUrl = 'https://jsexpert-socket-server.herokuapp.com/';
   const peerConfig = Object.values({
 		id: undefined,
 		config: {
-			host: 'localhost',
-			port: 9000,
+			host: 'my-peers-server.herokuapp.com',
 			path: '/',
-			secure: false,
-			debug: true
+			secure: true,
+			// port: 9000,
+			// debug: true
 		}
 	})
 
